@@ -147,7 +147,7 @@ define(["tools/hash"], function(hashlib){
                 }
             }
         })
-        , view = new View({el: window.__options__.$messagingContainer})
+        , view = new View({el: $(window.__options__.messagingContainer)})
         , addMessage = function(params){
             var model = new Message(params)
             try {
