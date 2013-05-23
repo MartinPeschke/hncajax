@@ -1,4 +1,4 @@
-define(["tools/messaging", "tools/hash"， "tools/form"], function(messaging, hashlib, formlib){
+define(["tools/messaging", "tools/hash", "tools/form"], function(messaging, hashlib, formlib){
   var opts = window.__options__
   , ajax = {
       submit: function(options){

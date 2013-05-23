@@ -3,15 +3,13 @@ define([], function(){
         console.warn("NOT IMPLEMENTED PARSLEY VALIDATION YET");
         var form = params.root.is("form.form-validated") ? params.root : params.root.find("form.form-validated")
         var opts = _.extend({}, params)
-            , validator = $(form).parsley(opts)
-            , view = this;
-        return validator;
+        return $(form).parsley(opts);
     }
-    , resetForm: function(form){
+    , resetForm = function(form){
         var $f = $(form);
         console.warn("NOT IMPLEMENTED PARSLEY VALIDATION YET");
     }
-    , showFormEncodeErrors: function($form, errors){
+    , showFormEncodeErrors = function($form, errors){
         var formId = $form.find("[name=type]").val();
         for(var k in errors){
             if(/--repetitions$/.test(k))delete errors[k];
@@ -26,7 +24,5 @@ define([], function(){
         $form.find(".error-hidden").hide(); // show any additional hints/elems
         $form.find(".error-shown").fadeIn(); // show any additional hints/elems
   }
-    
-    
-  return {validate: validate, resetForm: resetForm};
+  return {validate: validate, resetForm: resetForm, showFormEncodeErrors: showFormEncodeErrors};
 });
