@@ -1,4 +1,4 @@
-define(['tools/messaging', "tools/hash"], function(messaging, hashlib){
+define(["tools/messaging", "tools/hash"， "tools/form"], function(messaging, hashlib, formlib){
   var opts = window.__options__
   , ajax = {
       submit: function(options){
@@ -17,9 +17,9 @@ define(['tools/messaging', "tools/hash"], function(messaging, hashlib){
                     window.location.href = hnc.options.furl;
                   } else if (resp.dbMessage){
                     if(options.error){options.error(resp.dbMessage, resp, data);}
-                    else {messaging.addError({message:hnc.translate(resp.dbMessage)})}
+                    else {messaging.addError({message:resp.dbMessage})}
                   } else if (resp.errorMessage){
-                    messaging.addError({message:hnc.translate(resp.errorMessage)});
+                    messaging.addError({message:resp.errorMessage});
                   } else if (options.success) options.success.apply(this, [resp, status, xhr, data]);
                   if(resp.message){
                     messaging[resp.success?'addSuccess':'addError']({message:resp.message})
@@ -38,12 +38,6 @@ define(['tools/messaging', "tools/hash"], function(messaging, hashlib){
         if(!_.isEmpty(opts.fb.user))
             options.data.token = opts.fb.user.token
         return ajax.submitPrefixed(options);
-      }
-      , resetForm : function(form){
-          form = $(form).is("form.form-validated") ? $(form) : $(form).find("form.form-validated");
-          form.find("input,textarea").val("");
-          form.validate().resetForm();
-          form.find(".btn").button("reset");
       }
       , serializeArray : function(list) {
           if(!list)return {};
@@ -115,21 +109,8 @@ define(['tools/messaging', "tools/hash"], function(messaging, hashlib){
                       , error: params.error
                       , success: function(resp, status, xhr, data){
                           if(resp.success === false && resp.errors) {
-                              var formId = $form.find("[name=type]").val();
-                              for(var k in resp.errors){
-                                  if(/--repetitions$/.test(k))delete resp.errors[k];
-                                  else { // formencode sends null errors into the list, needs stripping for jquery validate
-                                    if(_.isEmpty(resp.errors[k]))delete resp.errors[k];
-                                  }
-                              }
-
-                              validator.showErrors(resp.errors);
-                              for(var attr in resp.values){
-                                  $form.find("#"+formId+"\\."+attr).val(resp.values[attr]);
-                              }
-                              $form.find(".error-hidden").hide(); // show any additional hints/elems
-                              $form.find(".error-shown").fadeIn(); // show any additional hints/elems
-                              if(params.error)params.error(resp, status, xhr, data)
+                            formlib.showFormEncodeErrors($form, resp.errors);
+                            if(params.error)params.error(resp, status, xhr, data)
                           } else {
                             if(resp.message){
                                 messaging[resp.success?'addSuccess':'addError']({message:resp.message});
@@ -154,7 +135,7 @@ define(['tools/messaging', "tools/hash"], function(messaging, hashlib){
           else form = $(form).find("form.form-validated");
           form.on({submit: noop, 'change':function(e, mod){ if(mod!='private')form.addClass("data-dirty")}});
           validationParams = validationParams||{};
-          return hnc.validate(_.extend(validationParams, {root: form, submitHandler : baseFormsOnSubmit}));
+          return formlib.validate(_.extend(validationParams, {root: form, submitHandler : baseFormsOnSubmit}));
         }
     };
     ajax.Model = Backbone.Model.extend({
